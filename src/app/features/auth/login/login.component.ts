@@ -1,42 +1,46 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/auth/auth.service';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private router = inject(Router);
+  public themeService = inject(ThemeService);
 
-  public loginForm: FormGroup = this.fb.group({
+  public theme = this.themeService.currentTheme;
+  public isLoading = false;
+  public errorMessage = '';
+  public showPassword = false;
+
+  public loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   public onSubmit(): void {
-    if (this.loginForm.valid) {
-      // Extraímos os valores do formulário (email e password)
-      const credentials = this.loginForm.value;
+    if (this.loginForm.invalid) return;
 
-      // Chamamos o serviço que baterá no Spring Boot
-      this.authService.login(credentials).subscribe({
-        next: (response) => {
-          console.log('Autenticação com o Spring Boot bem-sucedida!', response);
-          this.router.navigate(['/dashboard']); // Vamos para o Post Feed!
-        },
-        error: (err) => {
-          console.error('Falha na autenticação (Rejeitado pelo Java):', err);
-          alert('Acesso negado. Verifique as suas credenciais no backend.');
-        }
-      });
-    }
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login(this.loginForm.value as any).subscribe({
+      next: () => {
+        this.isLoading = false;
+        // O AuthService já trata do redirecionamento para o /feed
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'Credenciais inválidas ou erro no servidor.';
+        console.error('Erro de Autenticação:', err);
+      }
+    });
   }
 }

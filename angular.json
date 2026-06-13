@@ -33,7 +33,14 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              },
+              "src/favicon.ico",
+              "src/favicon.png"
             ],
             "styles": [
               "src/styles.scss"

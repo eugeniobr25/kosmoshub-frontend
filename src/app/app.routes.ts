@@ -13,8 +13,8 @@ export const routes: Routes = [
   },
   {
     path: 'feed',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/observation-post/post-feed/post-feed.component').then(m => m.PostFeedComponent)
+    canActivate: [authGuard], 
+    loadComponent: () => import('./features/feed/feed-timeline/feed-timeline.component').then(m => m.FeedTimelineComponent)
   },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
 ];

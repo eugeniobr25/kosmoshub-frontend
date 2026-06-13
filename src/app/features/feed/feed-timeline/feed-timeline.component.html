@@ -1,0 +1,58 @@
+<div class="min-h-screen pt-20 pb-32 px-4 max-w-2xl mx-auto flex flex-col gap-6"
+     [ngClass]="{'bg-slate-100': theme() === 'light', 'bg-pure-black': theme() !== 'light'}">
+  
+  <h1 class="font-heading text-2xl mb-4" 
+      [ngClass]="{'text-slate-900': theme() === 'light', 'text-white': theme() === 'dark', 'text-mars-red': theme() === 'red'}">
+    Descobertas Recentes
+  </h1>
+
+  @for (post of postService.posts(); track post.id) {
+    <article class="bento-card flex flex-col gap-4 overflow-hidden" [ngClass]="getCardClasses()">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-slate-500 overflow-hidden flex-shrink-0">
+          @if (post.user?.avatarUrl) {
+            <img [src]="post.user.avatarUrl" alt="Avatar" class="w-full h-full object-cover">
+          } @else {
+            <div class="w-full h-full flex items-center justify-center font-bold text-white bg-indigo-600">
+              {{ post.user?.username?.charAt(0) | uppercase }}
+            </div>
+          }
+        </div>
+        <div>
+          <p class="font-bold text-sm">{{ post.user?.username || 'Astrónomo Anónimo' }}</p>
+          <p class="text-xs opacity-60 font-mono">{{ post.createdAt | date:'dd MMM, HH:mm' }}</p>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-heading text-xl font-bold">{{ post.targetName }}</h2>
+        <div class="flex gap-2 mt-2">
+          <span class="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border opacity-80"
+                [ngClass]="theme() === 'red' ? 'border-mars-red text-mars-red' : 'border-current'">
+            Seeing: {{ post.seeingMetadata || 'N/A' }}
+          </span>
+        </div>
+      </div>
+
+      <p class="text-sm opacity-90 leading-relaxed">{{ post.equipmentMetadata || 'Sem detalhes de equipamento.' }}</p>
+
+    </article>
+  } @empty {
+    @if (!postService.isLoading()) {
+      <div class="text-center py-20 opacity-50 border border-dashed rounded-xl" [ngClass]="theme() === 'red' ? 'border-mars-red' : 'border-current'">
+        <i class="fa-solid fa-satellite text-3xl mb-3"></i>
+        <p>Ainda não há relatos nesta região do cosmos.</p>
+      </div>
+    }
+  }
+
+  <div appInfiniteScroll (scrolled)="onScroll()" class="h-10 w-full flex items-center justify-center mt-4">
+    @if (postService.isLoading()) {
+      <i class="fa-solid fa-circle-notch fa-spin text-xl opacity-50" [ngClass]="{'text-mars-red': theme() === 'red'}"></i>
+    } @else if (postService.isLastPage() && postService.posts().length > 0) {
+      <p class="text-xs opacity-50 font-mono text-center">Fim dos registos observacionais.</p>
+    }
+  </div>
+
+</div>
