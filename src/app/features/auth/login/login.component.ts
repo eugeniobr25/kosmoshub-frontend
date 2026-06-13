@@ -23,9 +23,20 @@ export class LoginComponent {
 
   public onSubmit(): void {
     if (this.loginForm.valid) {
-      // Simulação da chamada ao Backend (vamos conectar com o AuthService depois)
-      console.log('Dados do formulário:', this.loginForm.value);
-      this.router.navigate(['/dashboard']);
+      // Extraímos os valores do formulário (email e password)
+      const credentials = this.loginForm.value;
+
+      // Chamamos o serviço que baterá no Spring Boot
+      this.authService.login(credentials).subscribe({
+        next: (response) => {
+          console.log('Autenticação com o Spring Boot bem-sucedida!', response);
+          this.router.navigate(['/dashboard']); // Vamos para o Post Feed!
+        },
+        error: (err) => {
+          console.error('Falha na autenticação (Rejeitado pelo Java):', err);
+          alert('Acesso negado. Verifique as suas credenciais no backend.');
+        }
+      });
     }
   }
 }

@@ -1,3 +1,50 @@
+/* ==========================================================================
+   1. Importação de Tipografia (Google Fonts)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import '@fortawesome/fontawesome-free/css/all.css';
+
+/* ==========================================================================
+   2. Diretivas Base do Tailwind CSS
+   ========================================================================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   3. Estilos Globais e Tipografia Base
+   ========================================================================== */
+@layer base {
+  body {
+    @apply font-sans antialiased transition-colors duration-500;
+  }
+}
+
+/* ==========================================================================
+   4. Componentes Globais (Reutilizáveis)
+   ========================================================================== */
+@layer components {
+  .bento-card {
+    @apply rounded-2xl p-5 shadow-lg border transition-all duration-300 flex flex-col justify-between;
+  }
+
+  .astro-media-mask {
+    @apply absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-0 bg-red-600 mix-blend-color;
+  }
+
+  .theme-red .astro-media-mask {
+    @apply opacity-100;
+  }
+
+  .btn-astro {
+    @apply transition-all duration-150 ease-out select-none;
+
+    &:active {
+      @apply scale-95;
+    }
+    
+    > i.fa-plus {
+        @apply transition-transform duration-300;
+    }
+  }
+}

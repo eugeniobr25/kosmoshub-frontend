@@ -1,15 +1,15 @@
 <div class="min-h-screen transition-colors duration-500 font-sans"
      [ngClass]="{
-       'bg-paper-white text-sky-blue': theme() === 'light',
-       'bg-night-bg text-night-text': theme() === 'dark',
-       'bg-astro-black text-astro-red': theme() === 'red'
+       'theme-light bg-slate-100 text-slate-900': theme() === 'light',
+       'theme-dark bg-space-blue text-cosmic-silver': theme() === 'dark',
+       'theme-red bg-pure-black text-mars-red': theme() === 'red'
      }">
 
   <app-sidebar></app-sidebar>
 
-  <main class="lg:ml-64 min-h-screen">
-    
+  <main class="lg:ml-64 min-h-screen relative">
     <router-outlet></router-outlet>
-
+    
+    <app-circular-fab></app-circular-fab>
   </main>
 </div>

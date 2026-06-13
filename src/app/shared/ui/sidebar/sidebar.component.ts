@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './sidebar.component.html'
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  public themeService = inject(ThemeService);
+}

@@ -1,0 +1,89 @@
+<div class="p-4 lg:p-8 h-full w-full">
+  <header class="mb-8">
+    <h1 class="text-3xl font-heading tracking-tight" [ngClass]="{
+          'text-slate-900': theme() === 'light',
+          'text-cosmic-silver': theme() === 'dark',
+          'text-mars-red': theme() === 'red'
+        }">
+      Painel de Observação
+    </h1>
+    <p class="text-sm opacity-60">Sessão Ativa</p>
+  </header>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[minmax(180px,auto)]">
+
+    <div class="bento-card col-span-1" [ngClass]="cardClasses()">
+      <h2 class="text-xs uppercase tracking-wider font-heading opacity-70">Navegação Local</h2>
+      <div class="my-auto text-center">
+        <p class="text-2xl font-bold font-mono">3° 43' S | 38° 32' W</p>
+      </div>
+    </div>
+
+    <div class="bento-card col-span-1" [ngClass]="cardClasses()">
+      <h2 class="text-xs uppercase tracking-wider font-heading opacity-70">Tempo Cósmico</h2>
+      <div class="my-auto text-center">
+        <p class="text-3xl font-bold font-mono tracking-wider">{{ now() | date:'HH:mm:ss':'UTC' }} UTC</p>
+      </div>
+    </div>
+
+    <div class="bento-card md:col-span-2 lg:col-span-2" [ngClass]="cardClasses()">
+      <h2 class="text-xs uppercase tracking-wider font-heading opacity-70">Clima & Estabilidade Atmosférica</h2>
+      <div class="grid grid-cols-3 gap-2 my-auto text-center text-sm">
+        <div><span class="block text-xl font-bold font-mono">0%</span> Nuvens</div>
+        <div><span class="block text-xl font-bold font-mono">Minguante</span> Lua</div>
+        <div><span class="block text-xl font-bold font-mono">Excelente</span> Seeing</div>
+      </div>
+    </div>
+
+    <div class="bento-card hidden lg:flex lg:col-span-2 lg:row-span-2 relative overflow-hidden group cursor-pointer"
+      [ngClass]="cardClasses()" (click)="openImageModal()">
+      <div
+        class="absolute inset-0 z-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-500"
+        style="background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=500');"></div>
+
+      <div class="astro-media-mask z-10"></div>
+
+      <div
+        class="relative z-20 flex flex-col justify-between h-full w-full bg-gradient-to-t from-black/80 via-transparent to-transparent p-1">
+        <h2 class="text-xs uppercase tracking-wider font-heading opacity-90 text-white">Última Captura da Comunidade
+        </h2>
+        <p class="text-sm text-slate-200 font-medium mt-auto">Nebulosa de Órion (M42) - Refrator 80mm Apo</p>
+      </div>
+    </div>
+
+    <div class="bento-card lg:col-span-1" [ngClass]="cardClasses()">
+      <h2 class="text-xs uppercase tracking-wider font-heading opacity-70 mb-4">Projetos DIY Ativos</h2>
+      <div class="my-auto flex flex-col justify-center h-full">
+        @if (isLoadingDiy()) {
+        <p class="text-sm opacity-60 animate-pulse">A carregar...</p>
+        } @else if (latestDiy()) {
+        <p class="text-sm font-bold truncate">{{ latestDiy().title || 'Projeto sem título' }}</p>
+        <p class="text-xs opacity-70 mt-1 line-clamp-2">{{ latestDiy().description || 'Sem descrição' }}</p>
+        } @else {
+        <p class="text-sm opacity-60">Nenhum projeto disponível.</p>
+        }
+      </div>
+    </div>
+
+    <div class="bento-card lg:col-span-1 lg:row-span-2" [ngClass]="cardClasses()">
+      <h2 class="text-xs uppercase tracking-wider font-heading opacity-70 mb-4">Agenda de Alvos</h2>
+      <div class="flex-1 flex flex-col justify-center border border-dashed rounded-xl p-3 opacity-80 transition-colors"
+        [ngClass]="theme() === 'red' ? 'border-mars-red/30' : 'border-current'">
+
+        @if (isLoadingPlan()) {
+        <p class="text-center text-xs opacity-60 animate-pulse">A carregar planos...</p>
+        } @else if (latestPlan()) {
+        <p class="text-sm font-bold text-center mb-2">{{ latestPlan().targetName || latestPlan().title || 'Alvo não
+          especificado' }}</p>
+        <div class="text-xs flex justify-between border-t border-current/20 pt-2 mt-2">
+          <span>Data:</span>
+          <span class="font-mono">{{ latestPlan().observationDate ? (latestPlan().observationDate | date:'dd/MM/yyyy') :
+            'TBD' }}</span>F
+        </div>
+        } @else {
+        <p class="text-center text-xs opacity-60">Nenhum plano para esta janela</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>
