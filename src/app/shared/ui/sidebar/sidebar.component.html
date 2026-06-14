@@ -1,0 +1,47 @@
+<aside class="fixed inset-y-0 left-0 z-40 flex flex-col transition-all duration-300 border-r shadow-2xl backdrop-blur-xl"
+       [ngClass]="{
+         'w-64': layoutService.isSidebarExpanded(),
+         'w-20': !layoutService.isSidebarExpanded(),
+         'bg-white/80 border-slate-200 text-slate-900': theme() === 'light',
+         'bg-space-blue-dark/90 border-white/10 text-cosmic-silver': theme() === 'dark',
+         'bg-pure-black/95 border-mars-red/30 text-mars-red': theme() === 'red'
+       }">
+  
+  <div class="h-28 flex items-center justify-center border-b transition-colors p-4"
+       [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-current/10'">
+    
+    <div class="transition-all duration-300 flex items-center justify-center w-full h-full">
+      <img [src]="getLogoUrl()" 
+           alt="Logo KósmosHub" 
+           class="w-full h-full object-contain">
+    </div>
+  </div>
+
+  <nav class="flex-1 py-4 px-3 flex flex-col gap-2 overflow-x-hidden">
+    
+    <button (click)="layoutService.toggleSidebar()"
+            class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group text-left focus:outline-none"
+            [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 text-mars-red' : 'hover:bg-current/10'">
+      <i class="fa-solid text-lg w-6 text-center transition-transform duration-300" 
+         [ngClass]="layoutService.isSidebarExpanded() ? 'fa-chevron-left opacity-70 group-hover:opacity-100' : 'fa-bars opacity-70 group-hover:opacity-100'"></i>
+      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
+            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0 hidden'">Recolher Menu</span>
+    </button>
+
+    <div class="w-full h-px my-1 opacity-20" [ngClass]="theme() === 'red' ? 'bg-mars-red' : 'bg-current'"></div>
+
+    <a routerLink="/dashboard" class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group"
+       [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 hover:text-mars-red' : 'hover:bg-current/10'">
+      <i class="fa-solid fa-chart-pie text-lg w-6 text-center opacity-70 group-hover:opacity-100"></i>
+      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
+            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0'">Controle de Missão</span>
+    </a>
+    
+    <a routerLink="/feed" class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group"
+       [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 hover:text-mars-red' : 'hover:bg-current/10'">
+      <i class="fa-solid fa-camera-retro text-lg w-6 text-center opacity-70 group-hover:opacity-100"></i>
+      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
+            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0'">Registros de Observação</span>
+    </a>
+  </nav>
+</aside>

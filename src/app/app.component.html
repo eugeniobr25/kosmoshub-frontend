@@ -1,14 +1,24 @@
-<div class="min-h-screen transition-colors duration-500 font-sans"
+<div class="min-h-screen transition-colors duration-500 font-sans flex"
      [ngClass]="{
        'theme-light bg-slate-100 text-slate-900': theme() === 'light',
        'theme-dark bg-space-blue text-cosmic-silver': theme() === 'dark',
        'theme-red bg-pure-black text-mars-red': theme() === 'red'
      }">
 
-  <app-sidebar></app-sidebar>
+  @if (authService.isAuthenticated()) {
+    <app-sidebar></app-sidebar>
+  }
 
-  <main class="lg:ml-64 min-h-screen relative">
-    <router-outlet></router-outlet>
+  <main class="flex-1 min-h-screen flex flex-col relative transition-all duration-300"
+        [ngClass]="authService.isAuthenticated() ? (layoutService.isSidebarExpanded() ? 'lg:ml-64' : 'lg:ml-20') : ''">
+    
+    @if (authService.isAuthenticated()) {
+      <app-topbar></app-topbar>
+    }
+    
+    <div class="flex-1 overflow-x-hidden">
+      <router-outlet></router-outlet>
+    </div>
     
     <app-circular-fab></app-circular-fab>
   </main>
