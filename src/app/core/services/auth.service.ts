@@ -36,6 +36,11 @@ export class AuthService {
     );
   }
 
+  // MÉTODO ADICIONADO: Conecta o formulário de Registro ao Spring Boot
+  public register(userData: { name: string; email: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, userData);
+  }
+
   public logout(): void {
     localStorage.removeItem(this.tokenKey);
     this.isAuthenticated.set(false);

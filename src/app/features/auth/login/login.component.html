@@ -14,7 +14,6 @@
              'bg-space-blue/50 border-white/20 shadow-[0_0_25px_rgba(99,102,241,0.25)]': theme() === 'dark',
              'bg-red-950/80 border-mars-red shadow-[0_0_25px_rgba(239,68,68,0.4)]': theme() === 'red'
            }">
-        
         <img [src]="theme() === 'dark' ? '/assets/images/logo-no-name-grey.png' : (theme() === 'red' ? '/assets/images/logo-no-name-red.png' : '/assets/images/logo-no-name.png')" 
              alt="KósmosHub Logo" 
              class="w-full h-full object-cover rounded-full transition-transform duration-500 hover:scale-110 relative z-10">
@@ -29,17 +28,17 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
       <div class="flex flex-col gap-1.5">
-        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Correio Eletrónico</label>
-        <input type="email" formControlName="email" placeholder="astronomo@kosmos.com"
+        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Email</label>
+        <input type="email" formControlName="email" placeholder="nome@exemplo.com"
                class="w-full px-4 py-3.5 rounded-2xl bg-transparent border outline-none font-mono text-sm"
                [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red placeholder-mars-red/30 focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'">
       </div>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex justify-between items-center ml-1">
-          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold">Senha de Ignição</label>
+          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold">Senha</label>
           <a href="javascript:void(0)" class="text-[10px] font-bold hover:underline transition-all"
-             [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'">Esqueceu a senha?</a>
+             [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'">Esqueci a senha</a>
         </div>
         <div class="relative">
           <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="••••••••"
@@ -63,7 +62,7 @@
             <i class="fa-solid fa-check text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"
                [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'"></i>
           </div>
-          <span class="text-xs opacity-70 font-medium select-none group-hover:opacity-100 transition-opacity">Lembrar meu e-mail</span>
+          <span class="text-xs opacity-70 font-medium select-none group-hover:opacity-100 transition-opacity">Lembrar o meu email</span>
         </label>
       </div>
 
@@ -86,7 +85,7 @@
       
       <div class="text-center mt-2 border-t pt-6" [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-slate-400/20'">
         <p class="text-xs opacity-70 mb-3">Primeira vez na base?</p>
-        <button type="button" 
+        <button type="button" routerLink="/auth/register"
                 class="w-full py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 border-2"
                 [ngClass]="theme() === 'red' ? 'border-mars-red/50 text-mars-red hover:bg-mars-red/10' : 'border-slate-400/50 hover:bg-slate-400/10'">
           Criar Novo Registo

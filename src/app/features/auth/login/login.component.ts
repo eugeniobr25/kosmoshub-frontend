@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router'; // <-- Módulo de Rotas Adicionado
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // <-- Injetado no Componente
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
@@ -34,7 +35,7 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value as any).subscribe({
       next: () => {
         this.isLoading = false;
-        // O AuthService já trata do redirecionamento para o /feed
+        // O AuthService já trata do redirecionamento
       },
       error: (err) => {
         this.isLoading = false;

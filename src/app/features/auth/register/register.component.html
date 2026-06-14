@@ -1,0 +1,206 @@
+<div class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+  
+  <div class="relative w-full max-w-md rounded-[2rem] p-10 backdrop-blur-xl transition-all duration-500 z-10"
+       [ngClass]="{
+         'bg-white/60 border border-white/50 shadow-2xl text-slate-900': theme() === 'light',
+         'bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] text-white': theme() === 'dark',
+         'bg-red-950/20 border border-mars-red/20 shadow-[0_0_40px_rgba(239,68,68,0.15)] text-mars-red': theme() === 'red'
+       }">
+    
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full overflow-hidden border p-1 transition-all duration-500 shadow-lg relative"
+           [ngClass]="{
+             'bg-white border-slate-300 shadow-slate-900/10': theme() === 'light',
+             'bg-space-blue/50 border-white/20 shadow-[0_0_25px_rgba(99,102,241,0.25)]': theme() === 'dark',
+             'bg-red-950/80 border-mars-red shadow-[0_0_25px_rgba(239,68,68,0.4)]': theme() === 'red'
+           }">
+        <img [src]="theme() === 'dark' ? '/assets/images/logo-no-name-grey.png' : (theme() === 'red' ? '/assets/images/logo-no-name-red.png' : '/assets/images/logo-no-name.png')" 
+             alt="KósmosHub Logo" class="w-full h-full object-cover rounded-full relative z-10">
+        @if (theme() === 'red') {
+          <div class="absolute inset-0 bg-red-600/20 pointer-events-none animate-pulse z-0"></div>
+        }
+      </div>
+      <h1 class="text-2xl font-heading font-bold tracking-widest uppercase mt-3">Novo Registo</h1>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Nome completo</label>
+        <input type="text" formControlName="name" placeholder="O seu nome"
+               class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm"
+               [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Email</label>
+        <input type="email" formControlName="email" placeholder="nome@exemplo.com"
+               class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm"
+               [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Senha</label>
+        <div class="relative">
+          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••"
+                 class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm pr-12"
+                 [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
+          
+          <button type="button" 
+                  (mousedown)="showPassword.set(true)" (mouseup)="showPassword.set(false)" (mouseleave)="showPassword.set(false)"
+                  (touchstart)="showPassword.set(true)" (touchend)="showPassword.set(false)"
+                  class="absolute inset-y-0 right-0 pr-4 flex items-center opacity-50 hover:opacity-100 transition-opacity">
+            <i class="fa-solid" [ngClass]="showPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-1 px-1 mt-1">
+          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLength() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
+            <i class="fa-solid" [ngClass]="reqLength() ? 'fa-check' : 'fa-xmark'"></i> Mín. 8 caracteres
+          </div>
+          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqUpper() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
+            <i class="fa-solid" [ngClass]="reqUpper() ? 'fa-check' : 'fa-xmark'"></i> Maiúscula
+          </div>
+          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLower() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
+            <i class="fa-solid" [ngClass]="reqLower() ? 'fa-check' : 'fa-xmark'"></i> Minúscula
+          </div>
+          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqNum() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
+            <i class="fa-solid" [ngClass]="reqNum() ? 'fa-check' : 'fa-xmark'"></i> Número
+          </div>
+          <div class="text-[9px] col-span-2 flex items-center gap-1 transition-colors" [ngClass]="reqSym() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
+            <i class="fa-solid" [ngClass]="reqSym() ? 'fa-check' : 'fa-xmark'"></i> Símbolo (ex: !@#$*)
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Confirmar Senha</label>
+        <div class="relative">
+          <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••"
+                 class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm pr-12 transition-all"
+                 [ngClass]="{
+                   'border-slate-400/50 focus:border-indigo-400': matchStatus() === null && theme() !== 'red',
+                   'border-mars-red/30 focus:border-mars-red': matchStatus() === null && theme() === 'red',
+                   'border-green-500 text-green-500': matchStatus() === true && theme() !== 'red',
+                   'border-red-500 text-red-500': matchStatus() === false && theme() !== 'red',
+                   'border-mars-red text-mars-red shadow-[0_0_10px_rgba(239,68,68,0.5)]': matchStatus() === true && theme() === 'red',
+                   'border-red-800 text-red-800': matchStatus() === false && theme() === 'red'
+                 }"/>
+          <button type="button" 
+                  (mousedown)="showConfirmPassword.set(true)" (mouseup)="showConfirmPassword.set(false)" (mouseleave)="showConfirmPassword.set(false)"
+                  (touchstart)="showConfirmPassword.set(true)" (touchend)="showConfirmPassword.set(false)"
+                  class="absolute inset-y-0 right-0 pr-4 flex items-center opacity-50 hover:opacity-100">
+            <i class="fa-solid" [ngClass]="showConfirmPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+        </div>
+
+        <div class="h-1 w-full rounded-full transition-all duration-500 mt-1"
+             [ngClass]="{
+               'bg-current opacity-20': matchStatus() === null,
+               'bg-green-500': matchStatus() === true && theme() !== 'red',
+               'bg-red-500': matchStatus() === false && theme() !== 'red',
+               'bg-mars-red shadow-[0_0_5px_rgba(239,68,68,0.8)]': matchStatus() === true && theme() === 'red',
+               'bg-red-900': matchStatus() === false && theme() === 'red'
+             }"></div>
+        
+        <div class="h-3 ml-1">
+          @if (matchStatus() === true) {
+            <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-green-500'">As senhas coincidem.</p>
+          } @else if (matchStatus() === false) {
+            <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-red-800' : 'text-red-500'">As senhas não coincidem.</p>
+          }
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mt-2 ml-1">
+        <label class="flex items-center gap-2 cursor-pointer group">
+          <div class="relative flex items-center justify-center w-4 h-4 rounded border transition-colors"
+               [ngClass]="theme() === 'red' ? 'border-mars-red/50 group-hover:border-mars-red' : 'border-slate-400/50 group-hover:border-indigo-400'">
+            <input type="checkbox" formControlName="terms" class="peer opacity-0 absolute inset-0 cursor-pointer">
+            <i class="fa-solid fa-check text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"
+               [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'"></i>
+          </div>
+        </label>
+        <span class="text-[10px] opacity-80 select-none">
+          Li e concordo com os 
+          <a href="javascript:void(0)" (click)="toggleTermsModal()" class="font-bold underline transition-colors"
+             [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'">Termos de Uso e Privacidade</a>.
+        </span>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="text-center text-xs font-bold animate-pulse p-2 rounded-lg mt-1" 
+             [ngClass]="theme() === 'red' ? 'bg-mars-red/10 text-mars-red' : 'bg-red-500/10 text-red-500'">
+          <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ errorMessage() }}
+        </div>
+      }
+
+      <button type="submit" [disabled]="registerForm.invalid || matchStatus() !== true || isLoading()"
+              class="w-full py-4 mt-2 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 shadow-lg disabled:opacity-30 disabled:cursor-not-allowed"
+              [ngClass]="theme() === 'red' ? 'bg-mars-red text-pure-black hover:bg-red-600' : 'bg-slate-900 text-white hover:bg-slate-800'">
+        @if (isLoading()) {
+          <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
+        } @else {
+          Concluir Registo
+        }
+      </button>
+      
+      <div class="text-center mt-2 border-t pt-4" [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-slate-400/20'">
+        <p class="text-xs opacity-70 mb-2">Já possui uma conta?</p>
+        <button type="button" routerLink="/auth/login"
+                class="w-full py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 border-2"
+                [ngClass]="theme() === 'red' ? 'border-mars-red/50 text-mars-red hover:bg-mars-red/10' : 'border-slate-400/50 hover:bg-slate-400/10'">
+          Voltar para Login
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if (showTermsModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div class="relative w-full max-w-2xl max-h-[85vh] rounded-3xl p-8 overflow-hidden flex flex-col shadow-2xl border"
+         [ngClass]="{
+           'bg-white text-slate-900 border-slate-300': theme() === 'light',
+           'bg-space-blue text-cosmic-silver border-white/20': theme() === 'dark',
+           'bg-pure-black text-mars-red border-mars-red/50 shadow-[0_0_30px_rgba(239,68,68,0.2)]': theme() === 'red'
+         }">
+      
+      <div class="flex justify-between items-center mb-6 pb-4 border-b" [ngClass]="theme() === 'red' ? 'border-mars-red/30' : 'border-current/20'">
+        <h2 class="text-xl font-heading font-bold uppercase tracking-widest">Termos de Uso e Privacidade</h2>
+        <button (click)="toggleTermsModal()" class="w-8 h-8 rounded-full flex items-center justify-center border hover:bg-current/10 transition-colors" [ngClass]="theme() === 'red' ? 'border-mars-red' : 'border-current/30'">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto pr-4 space-y-4 text-sm font-mono opacity-90 pb-6 custom-scrollbar">
+        <p><strong>Última atualização: Junho de 2026</strong></p>
+        
+        <h3 class="font-bold uppercase tracking-wider text-base mt-4">1. Conformidade de Dados (LGPD/GDPR)</h3>
+        <p>Ao registar-se no KósmosHub, o utilizador concorda com a recolha do seu nome, email e dados telemétricos de uso. Estes dados são encriptados e armazenados com finalidade estrita de providenciar serviços meteorológicos, gestão de conta e integração com a comunidade astronómica.</p>
+
+        <h3 class="font-bold uppercase tracking-wider text-base mt-4">2. Propriedade Intelectual</h3>
+        <p>A propriedade intelectual de todas as astrofotografias submetidas na secção <strong>Registros de Observação</strong> e tutoriais partilhados na <strong>Central de Conhecimento</strong> pertence exclusivamente ao seu criador. O KósmosHub detém apenas uma licença de exibição dentro da própria plataforma.</p>
+
+        <h3 class="font-bold uppercase tracking-wider text-base mt-4 text-red-500" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-red-500'">3. Política de Conduta, Anti-Ódio e Moderação</h3>
+        <p>O KósmosHub possui <strong>tolerância zero</strong> para discursos de ódio. São expressamente proibidos atos de discriminação baseados em raça, cor, etnia, procedência nacional, religião, orientação sexual (homofobia), identidade de género (transfobia), bem como qualquer outra forma de ofensa ou preconceito. A violação desta regra resultará no bloqueio e exclusão sumária da conta, sujeita a denúncia legal.</p>
+        <p>Para garantir um ambiente focado na ciência, discussões acalouradas, brigas ou motins nas secções de comentários não são permitidas. A plataforma dispõe de um sistema de <strong>Denúncia (Report)</strong>. Comentários denunciados serão ocultados e poderão ser definitivamente apagados, ou as contas suspensas, após análise técnica pela nossa equipa de Administradores.</p>
+
+        <h3 class="font-bold uppercase tracking-wider text-base mt-4">4. Geolocalização e Privacidade Espacial</h3>
+        <p>A sua localização geográfica exata (coordenadas de GPS), utilizada no módulo de <strong>Controle de Missão</strong> para previsão de janelas de observação, não é partilhada publicamente por defeito. Todos os metadados de localização embutidos (EXIF) em fotografias submetidas poderão sofrer "desfoque" algorítmico de segurança antes de serem exibidos publicamente.</p>
+
+        <h3 class="font-bold uppercase tracking-wider text-base mt-4">5. Alertas Solares e Isenção de Responsabilidade</h3>
+        <p>O KósmosHub exime-se de qualquer responsabilidade legal, médica ou civil por danos oculares temporários ou cegueira permanente decorrentes da utilização negligente de telescópios ou binóculos apontados ao sol sem filtros solares rigorosamente certificados e acoplados.</p>
+        
+        <p class="italic mt-6 opacity-70">Para prosseguir, feche esta janela e marque a caixa de confirmação no formulário para comprovar a leitura.</p>
+      </div>
+      
+      <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t pointer-events-none"
+           [ngClass]="{
+             'from-white to-transparent': theme() === 'light',
+             'from-space-blue to-transparent': theme() === 'dark',
+             'from-pure-black to-transparent': theme() === 'red'
+           }"></div>
+    </div>
+  </div>
+}
