@@ -1,132 +1,142 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { PostService } from '../../../core/services/post.service';
 import { ThemeService } from '../../../core/services/theme.service';
-import { DiyProjectService } from '../../../core/services/diy-project.service';
-import { ObservationPlanService } from '../../../core/services/observation-plan.service';
+import { WeatherService } from '../../../core/services/weather.service';
+
+import { LocationCardComponent } from '../components/location-card/location-card.component';
+import { TimeSyncCardComponent } from '../components/time-sync-card/time-sync-card.component';
+import { WeatherCardComponent } from '../components/weather-card/weather-card.component';
+import { PlanCardComponent } from '../components/plan-card/plan-card.component';
+import { ObservationCardComponent } from '../components/observation-card/observation-card.component';
+import { KnowledgeCardComponent } from '../components/knowledge-card/knowledge-card.component';
 
 @Component({
   selector: 'app-home-dashboard',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './home-dashboard.component.html',
-  styleUrls: ['./home-dashboard.component.scss']
+  imports: [
+    CommonModule, 
+    LocationCardComponent, 
+    TimeSyncCardComponent, 
+    WeatherCardComponent, 
+    PlanCardComponent, 
+    ObservationCardComponent, 
+    KnowledgeCardComponent
+  ],
+  templateUrl: './home-dashboard.component.html'
 })
-export class HomeDashboardComponent implements OnInit, OnDestroy {
-  public themeService = inject(ThemeService); 
-  private postService = inject(PostService);
-  private diyService = inject(DiyProjectService);
-  private planService = inject(ObservationPlanService);
+export class HomeDashboardComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  private weatherService = inject(WeatherService);
   private sanitizer = inject(DomSanitizer);
 
   public theme = this.themeService.currentTheme;
 
-  private timerInterval: any;
-  public now = signal<Date>(new Date());
-  
-  public utcHoursDeg = signal<number>(0);
-  public utcMinsDeg = signal<number>(0);
-  public localHoursDeg = signal<number>(0);
-  public localMinsDeg = signal<number>(0);
+  // Estados de Telemetria e Sensores
+  public isWeatherLoading = signal<boolean>(true);
+  public isNight = signal<boolean>(true);
+  public weatherData = signal<{ cloudCover: number, humidity: number, windSpeed: number, seeing: string } | null>(null);
 
-  public isNight = signal<boolean>(false);
-  public localTimezoneOffset = signal<string>('');
-  
   public mapUrl = signal<SafeResourceUrl | null>(null);
+  public locationCoords = signal<{ lat: number, lon: number, latStr: string, lonStr: string }>({ 
+    lat: -3.73, lon: -38.52, latStr: "3° 43' S", lonStr: "38° 32' W" 
+  });
 
-  public latestPost = signal<any | null>(null);
-  public latestDiy = signal<any | null>(null);
-  public latestPlan = signal<any | null>(null);
-  
-  public isLoadingPost = signal<boolean>(true);
-  public isLoadingDiy = signal<boolean>(true);
-  public isLoadingPlan = signal<boolean>(true);
+  // Mocks estruturais para as Cargas Úteis de Dados
+  public isLoadingPost = signal<boolean>(false);
+  public latestPost = signal<any>(null);
+  public isLoadingPlan = signal<boolean>(false);
+  public latestPlan = signal<any>(null);
+  public isLoadingDiy = signal<boolean>(false);
+  public latestDiy = signal<any>(null);
+
+  // SINAIS DOS ALERTAS DINÂMICOS
+  public currentDayAlert = signal<{title: string, tip: string, icon: string}>({ title: '', tip: '', icon: '' });
+  public currentNightTip = signal<{title: string, tip: string, icon: string}>({ title: '', tip: '', icon: '' });
+
+  // ARSENAL DE ALERTAS DIURNOS (Segurança Solar e UV)
+  private dayAlerts = [
+    { title: 'Risco de Cegueira', tip: 'Nunca aponte o telescópio ou binóculo para o Sol sem filtros Baader. A queima da retina é instantânea e irreversível.', icon: 'fa-eye-low-vision' },
+    { title: 'Exposição UV Extrema', tip: 'Observação diurna exige proteção. Use protetor solar FPS 50+, chapéu e roupas UV. Evite insolação e queimaduras.', icon: 'fa-temperature-arrow-up' },
+    { title: 'Cuidado com a Buscadora', tip: 'Mantenha a buscadora (finderscope) tampada. O Sol concentrado nela pode causar incêndios nas suas roupas ou pele.', icon: 'fa-fire' },
+    { title: 'Manchas Solares', tip: 'Filtro seguro instalado? Aproveite para fotografar manchas solares, mas faça pausas para resfriar o equipamento e hidratar-se.', icon: 'fa-camera' }
+  ];
+
+  // ARSENAL DE DICAS NOTURNAS (Lunar, Planetário e Visual)
+  private nightTips = [
+    { title: 'Ofuscamento Lunar', tip: 'A Lua cheia em telescópios causa ofuscamento e dor. Use sempre um filtro polarizador ou filtro lunar na ocular.', icon: 'fa-moon' },
+    { title: 'Janela Planetária', tip: 'Júpiter e suas luas estão visíveis. Use oculares de baixa milimetragem para detalhes das faixas de gás.', icon: 'fa-satellite' },
+    { title: 'Adaptação Visual', tip: 'Demora 30 minutos para os olhos se adaptarem ao escuro total. Mantenha o app no Modo Vermelho e evite faróis.', icon: 'fa-eye' },
+    { title: 'Céu Profundo (DSO)', tip: 'Noite sem Lua? É a janela perfeita para buscar nebulosas fracas com filtros UHC ou de Banda Estreita.', icon: 'fa-star' }
+  ];
 
   ngOnInit(): void {
-    this.setupLocationMap();
-    this.calculateTimezoneOffset();
-
-    this.timerInterval = setInterval(() => {
-      const d = new Date();
-      this.now.set(d);
-      
-      this.utcHoursDeg.set((d.getUTCHours() % 12) * 30 + d.getUTCMinutes() * 0.5);
-      this.utcMinsDeg.set(d.getUTCMinutes() * 6);
-      this.localHoursDeg.set((d.getHours() % 12) * 30 + d.getMinutes() * 0.5);
-      this.localMinsDeg.set(d.getMinutes() * 6);
-
-      const h = d.getHours();
-      this.isNight.set(h >= 18 || h < 5);
-    }, 1000);
-    
-    this.loadLatestPost();
-    this.loadLatestDiy();
-    this.loadLatestPlan();
+    this.initLocationAndWeather();
   }
 
-  ngOnDestroy(): void {
-    if (this.timerInterval) clearInterval(this.timerInterval);
+  public cardClasses(): string {
+    const t = this.theme();
+    if (t === 'dark') return 'bg-space-blue-dark/50 border-white/10 text-cosmic-silver';
+    if (t === 'red') return 'bg-pure-black/60 border-mars-red/20 text-mars-red shadow-[0_0_15px_rgba(239,68,68,0.1)]';
+    return 'bg-white/60 border-slate-200 text-slate-900 shadow-xl';
   }
 
-  public getLocalTimezone(): string {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  public initLocationAndWeather(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.updateLocationStrings(position.coords.latitude, position.coords.longitude);
+          this.fetchWeather(position.coords.latitude, position.coords.longitude);
+        },
+        () => {
+          this.updateLocationStrings(this.locationCoords().lat, this.locationCoords().lon);
+          this.fetchWeather(this.locationCoords().lat, this.locationCoords().lon);
+        }
+      );
+    } else {
+      this.updateLocationStrings(this.locationCoords().lat, this.locationCoords().lon);
+      this.fetchWeather(this.locationCoords().lat, this.locationCoords().lon);
+    }
   }
 
-  private calculateTimezoneOffset(): void {
-    const offset = -new Date().getTimezoneOffset() / 60;
-    const sign = offset >= 0 ? '+' : '-';
-    const pad = (n: number) => String(Math.abs(n)).padStart(2, '0');
-    this.localTimezoneOffset.set(`UTC ${sign}${pad(offset)}:00`);
-  }
+  private updateLocationStrings(lat: number, lon: number): void {
+    const latDir = lat >= 0 ? 'N' : 'S';
+    const lonDir = lon >= 0 ? 'E' : 'W';
+    const latDeg = Math.floor(Math.abs(lat));
+    const latMin = Math.floor((Math.abs(lat) - latDeg) * 60);
+    const lonDeg = Math.floor(Math.abs(lon));
+    const lonMin = Math.floor((Math.abs(lon) - lonDeg) * 60);
 
-  private setupLocationMap(): void {
-    const lat = -3.7319;
-    const lon = -38.5267;
-    const bbox = `${lon - 0.05},${lat - 0.05},${lon + 0.05},${lat + 0.05}`;
-    const url = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+    this.locationCoords.set({ lat, lon, latStr: `${latDeg}° ${latMin}' ${latDir}`, lonStr: `${lonDeg}° ${lonMin}' ${lonDir}` });
+
+    const url = `https://maps.google.com/maps?q=${lat},${lon}&t=k&z=11&ie=UTF8&iwloc=&output=embed`;
     this.mapUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
   }
 
-  private loadLatestPost(): void {
-    this.postService.getFeed(0, 1).subscribe({
+  private fetchWeather(lat: number, lon: number): void {
+    this.isWeatherLoading.set(true);
+    this.weatherService.getCurrentWeather(lat, lon).subscribe({
       next: (res) => {
-        if (res.content && res.content.length > 0) this.latestPost.set(res.content[0]);
-        this.isLoadingPost.set(false);
+        const current = res.current;
+        this.weatherData.set({
+          cloudCover: current.cloud_cover,
+          humidity: current.relative_humidity_2m,
+          windSpeed: current.wind_speed_10m,
+          seeing: this.weatherService.calculateSeeingHeuristic(current.wind_speed_10m, current.cloud_cover)
+        });
+        
+        const isNightTime = current.is_day === 0;
+        this.isNight.set(isNightTime);
+
+        // SORTEIO ALEATÓRIO DE ALERTAS NA ATUALIZAÇÃO DA TELA
+        this.currentDayAlert.set(this.dayAlerts[Math.floor(Math.random() * this.dayAlerts.length)]);
+        this.currentNightTip.set(this.nightTips[Math.floor(Math.random() * this.nightTips.length)]);
+
+        this.isWeatherLoading.set(false);
       },
-      error: () => this.isLoadingPost.set(false)
+      error: () => this.isWeatherLoading.set(false)
     });
   }
 
-  private loadLatestDiy(): void {
-    this.diyService.getProjects(0, 1).subscribe({
-      next: (res) => {
-        if (res.content && res.content.length > 0) this.latestDiy.set(res.content[0]);
-        this.isLoadingDiy.set(false);
-      },
-      error: () => this.isLoadingDiy.set(false)
-    });
-  }
-
-  private loadLatestPlan(): void {
-    this.planService.getPlans(0, 1).subscribe({
-      next: (res) => {
-        if (res.content && res.content.length > 0) this.latestPlan.set(res.content[0]);
-        this.isLoadingPlan.set(false);
-      },
-      error: () => this.isLoadingPlan.set(false)
-    });
-  }
-
-  public cardClasses() {
-    return {
-      'bg-white/80 border-slate-200 shadow-xl shadow-slate-200/30 text-slate-900': this.theme() === 'light',
-      'bg-white/5 border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-cosmic-silver': this.theme() === 'dark',
-      'bg-red-950/20 border-mars-red/30 shadow-[0_0_15px_rgba(239,68,68,0.05)] text-mars-red': this.theme() === 'red'
-    };
-  }
-
-  public openImageModal(): void {
-    console.log('Ativar Modal');
-  }
+  public openImageModal(): void {}
 }

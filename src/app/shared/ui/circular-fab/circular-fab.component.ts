@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ThemeService, ThemeMode } from '../../../core/services/theme.service';
+import { ThemeService, Theme } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-circular-fab',
@@ -11,18 +11,15 @@ import { ThemeService, ThemeMode } from '../../../core/services/theme.service';
 export class CircularFabComponent {
   public themeService = inject(ThemeService);
   public isOpen = signal<boolean>(false);
-  
   public screenLantern = signal<boolean>(false);
   public backLantern = signal<boolean>(false);
-
-  // Vinculação direta do sinal para atualização instantânea no DOM
   public theme = this.themeService.currentTheme;
 
   public toggleMenu(): void {
     this.isOpen.set(!this.isOpen());
   }
 
-  public changeTheme(mode: ThemeMode): void {
+  public changeTheme(mode: Theme): void {
     this.themeService.setTheme(mode);
   }
 

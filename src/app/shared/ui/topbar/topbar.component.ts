@@ -4,6 +4,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { LayoutService } from '../../../core/services/layout.service';
 
 @Component({
   selector: 'app-topbar',
@@ -15,14 +16,12 @@ export class TopbarComponent implements OnInit {
   public themeService = inject(ThemeService);
   public authService = inject(AuthService);
   private router = inject(Router);
-  
   public theme = this.themeService.currentTheme;
   public isMenuOpen = signal<boolean>(false);
-  
-  // Sinais Dinâmicos
   public pageTitle = signal<string>('Controle de Missão');
   public userFirstName = signal<string>('Astrónomo');
   public userAvatarUrl = signal<string | null>(null);
+  public layoutService = inject(LayoutService);
 
   ngOnInit() {
     this.updateTitleByUrl(this.router.url);

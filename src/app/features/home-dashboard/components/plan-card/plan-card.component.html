@@ -1,0 +1,31 @@
+<div class="h-full w-full rounded-[2rem] border backdrop-blur-xl p-5 flex flex-col relative overflow-hidden transition-all duration-300 min-h-[260px] [@media(min-width:1200px)_and_(min-height:600px)]:min-h-0"
+  [ngClass]="cardClasses">
+  <h2 class="text-[10px] uppercase tracking-widest font-heading opacity-70 mb-3 flex items-center gap-2 flex-shrink-0">
+    <i class="fa-solid fa-calendar-check"></i> Planejamento Diário
+  </h2>
+  
+  <div class="flex-1 flex flex-col justify-start items-start w-full overflow-y-auto pr-1 min-h-0">
+    @if (isLoadingPlan) {
+      <p class="text-left text-xs opacity-60 animate-pulse py-2">Procurando planos...</p>
+    } @else if (latestPlan) {
+      <p class="text-sm font-bold text-left mb-3">{{ latestPlan.targetName }}</p>
+    } @else {
+      <div class="flex flex-col gap-2 w-full">
+        <div class="flex items-start gap-3 bg-current/5 p-2.5 rounded-xl border border-current/5 backdrop-blur-sm w-full">
+          <i class="fa-solid fa-crosshairs text-xs shrink-0 mt-0.5" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-400'"></i>
+          <div class="text-left min-w-0 flex-1">
+            <p class="text-[11px] font-bold uppercase tracking-wide leading-tight break-words whitespace-normal">M42 - Nebulosa de Órion</p>
+            <p class="text-[8px] opacity-70 mt-1 leading-tight break-words whitespace-normal">Janela ideal: 21:00 - 01:30 • Filtro L-Pro</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-current/5 p-2.5 rounded-xl border border-current/5 backdrop-blur-sm w-full">
+          <i class="fa-solid fa-bullseye text-xs shrink-0 mt-0.5" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-400'"></i>
+          <div class="text-left min-w-0 flex-1">
+            <p class="text-[11px] font-bold uppercase tracking-wide leading-tight break-words whitespace-normal">Cratera Clavius (Lua)</p>
+            <p class="text-[8px] opacity-70 mt-1 leading-tight break-words whitespace-normal">Alta Ampliação • Seeing Estável</p>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

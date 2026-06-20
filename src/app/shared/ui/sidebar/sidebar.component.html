@@ -1,47 +1,85 @@
-<aside class="fixed inset-y-0 left-0 z-40 flex flex-col transition-all duration-300 border-r shadow-2xl backdrop-blur-xl"
+<aside class="w-full h-full flex flex-col bg-inherit border-r shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-500 ease-in-out"
        [ngClass]="{
-         'w-64': layoutService.isSidebarExpanded(),
-         'w-20': !layoutService.isSidebarExpanded(),
          'bg-white/80 border-slate-200 text-slate-900': theme() === 'light',
          'bg-space-blue-dark/90 border-white/10 text-cosmic-silver': theme() === 'dark',
          'bg-pure-black/95 border-mars-red/30 text-mars-red': theme() === 'red'
        }">
   
-  <div class="h-28 flex items-center justify-center border-b transition-colors p-4"
-       [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-current/10'">
+  <div class="flex items-center h-16 w-full px-2 flex-shrink-0">
     
-    <div class="transition-all duration-300 flex items-center justify-center w-full h-full">
-      <img [src]="getLogoUrl()" 
-           alt="Logo KósmosHub" 
-           class="w-full h-full object-contain">
+    <a routerLink="/dashboard" (click)="handleNavigationClick()" 
+       class="w-16 h-16 flex-shrink-0 flex items-center justify-center relative cursor-pointer z-20 block transition-transform active:scale-95">
+      
+      <img [src]="getLogoExpandedUrl()" alt="Logo Ícone" 
+           class="absolute w-full h-full p-2 object-contain transition-opacity duration-500 ease-in-out"
+           [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'">
+           
+      <img [src]="getLogoCollapsedUrl()" alt="Logo Completa" 
+           class="absolute w-full h-full p-2 object-contain transition-opacity duration-500 ease-in-out"
+           [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'">
+    </a>
+
+    <div class="transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap h-full flex items-center cursor-pointer z-20"
+         [ngClass]="layoutService.isSidebarExpanded() ? 'max-w-xs opacity-100 ml-1 delay-150' : 'max-w-0 opacity-0 ml-0 pointer-events-none'"
+         routerLink="/dashboard" (click)="handleNavigationClick()">
+      <h2 class="font-heading font-bold tracking-widest uppercase text-base shrink-0 select-none">
+        @if (theme() === 'light') {
+          <span class="text-slate-900">Kósmos</span><span class="text-indigo-600">Hub</span>
+        } @else if (theme() === 'dark') {
+          <span class="text-cosmic-silver">KósmosHub</span>
+        } @else {
+          <span class="text-mars-red">KósmosHub</span>
+        }
+      </h2>
     </div>
   </div>
 
-  <nav class="flex-1 py-4 px-3 flex flex-col gap-2 overflow-x-hidden">
-    
+  <nav class="flex-1 py-2 flex flex-col gap-2 overflow-x-hidden w-full select-none px-2">
+
     <button (click)="layoutService.toggleSidebar()"
-            class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group text-left focus:outline-none"
+            class="flex items-center text-left w-full h-9 rounded-lg transition-colors duration-300 group focus:outline-none active:scale-95"
             [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 text-mars-red' : 'hover:bg-current/10'">
-      <i class="fa-solid text-lg w-6 text-center transition-transform duration-300" 
-         [ngClass]="layoutService.isSidebarExpanded() ? 'fa-chevron-left opacity-70 group-hover:opacity-100' : 'fa-bars opacity-70 group-hover:opacity-100'"></i>
-      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
-            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0 hidden'">Recolher Menu</span>
+      
+      <span class="w-16 h-full flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid text-lg opacity-70 group-hover:opacity-100 transition-transform duration-300" 
+           [ngClass]="layoutService.isSidebarExpanded() ? 'fa-chevron-left' : 'fa-bars'"></i>
+      </span>
+
+      <div class="transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap"
+           [ngClass]="layoutService.isSidebarExpanded() ? 'max-w-xs opacity-100 delay-150' : 'max-w-0 opacity-0'">
+        <span class="font-bold text-[11px] uppercase tracking-widest">Recolher Menu</span>
+      </div>
     </button>
 
-    <div class="w-full h-px my-1 opacity-20" [ngClass]="theme() === 'red' ? 'bg-mars-red' : 'bg-current'"></div>
+    <div class="h-px my-0.5 opacity-10 mx-auto transition-all duration-500" 
+         [ngClass]="[theme() === 'red' ? 'bg-mars-red' : 'bg-current', layoutService.isSidebarExpanded() ? 'w-full' : 'w-12']"></div>
 
-    <a routerLink="/dashboard" class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group"
+    <a routerLink="/dashboard" (click)="handleNavigationClick()" 
+       class="flex items-center text-left w-full h-9 rounded-lg transition-colors duration-300 group active:scale-95"
        [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 hover:text-mars-red' : 'hover:bg-current/10'">
-      <i class="fa-solid fa-chart-pie text-lg w-6 text-center opacity-70 group-hover:opacity-100"></i>
-      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
-            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0'">Controle de Missão</span>
+      
+      <span class="w-16 h-full flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-chart-pie text-lg opacity-70 group-hover:opacity-100"></i>
+      </span>
+
+      <div class="transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap"
+           [ngClass]="layoutService.isSidebarExpanded() ? 'max-w-xs opacity-100 delay-150' : 'max-w-0 opacity-0'">
+        <span class="font-bold text-[11px] uppercase tracking-widest">Controle de Missão</span>
+      </div>
     </a>
     
-    <a routerLink="/feed" class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-300 group"
+    <a routerLink="/feed" (click)="handleNavigationClick()" 
+       class="flex items-center text-left w-full h-9 rounded-lg transition-colors duration-300 group active:scale-95"
        [ngClass]="theme() === 'red' ? 'hover:bg-mars-red/10 hover:text-mars-red' : 'hover:bg-current/10'">
-      <i class="fa-solid fa-camera-retro text-lg w-6 text-center opacity-70 group-hover:opacity-100"></i>
-      <span class="font-bold text-xs uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
-            [ngClass]="layoutService.isSidebarExpanded() ? 'opacity-100' : 'opacity-0'">Registros de Observação</span>
+      
+      <span class="w-16 h-full flex items-center justify-center flex-shrink-0">
+        <i class="fa-solid fa-camera-retro text-lg opacity-70 group-hover:opacity-100"></i>
+      </span>
+
+      <div class="transition-all duration-500 ease-in-out overflow-hidden whitespace-nowrap"
+           [ngClass]="layoutService.isSidebarExpanded() ? 'max-w-xs opacity-100 delay-150' : 'max-w-0 opacity-0'">
+        <span class="font-bold text-[11px] uppercase tracking-widest">Registros de Obs.</span>
+      </div>
     </a>
   </nav>
 </aside>

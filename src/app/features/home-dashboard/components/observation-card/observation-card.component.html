@@ -1,0 +1,29 @@
+<div class="h-full w-full rounded-[2rem] border backdrop-blur-xl relative overflow-hidden group cursor-pointer active:scale-[0.99] transition-all"
+  [ngClass]="cardClasses" (click)="imageClick.emit()">
+  <div class="absolute inset-0 z-0 bg-cover bg-center opacity-70 group-hover:scale-105 transition-transform duration-700 ease-out"
+    style="background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?q=80&w=500');"></div>
+  
+  @if (theme() === 'red') {
+    <div class="absolute inset-0 z-0 bg-red-900/60 mix-blend-multiply pointer-events-none"></div>
+  }
+  <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+  <div class="relative z-20 flex flex-col justify-between h-full w-full p-6">
+    <div class="flex justify-between items-start">
+      <h2 class="text-[10px] uppercase tracking-widest font-heading text-white/90 drop-shadow-md leading-tight break-words whitespace-normal">
+        <i class="fa-solid fa-camera-retro mr-2"></i> Registros de Observação
+      </h2>
+    </div>
+    <div class="mt-auto text-left">
+      @if (isLoadingPost) {
+        <p class="text-sm text-white/60 animate-pulse">A carregar capturas...</p>
+      } @else if (latestPost) {
+        <p class="text-lg text-white font-bold tracking-wide leading-tight break-words whitespace-normal">{{ latestPost.title || 'Nebulosa de Órion' }}</p>
+        <p class="text-xs text-white/70 font-mono mt-1 leading-tight break-words whitespace-normal">{{ latestPost.equipment || 'Refrator 80mm Apo' }}</p>
+      } @else {
+        <p class="text-lg text-white font-bold tracking-wide leading-tight break-words whitespace-normal">Galáxia de Andrômeda (M31)</p>
+        <p class="text-xs text-white/70 font-mono mt-1 leading-tight break-words whitespace-normal">Newtoniano 150mm • DSLR</p>
+      }
+    </div>
+  </div>
+</div>

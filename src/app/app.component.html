@@ -1,4 +1,4 @@
-<div class="min-h-screen transition-colors duration-500 font-sans flex"
+<div class="min-h-screen transition-colors duration-500 font-sans flex overflow-hidden bg-fixed bg-cover bg-center"
      [ngClass]="{
        'theme-light bg-slate-100 text-slate-900': theme() === 'light',
        'theme-dark bg-space-blue text-cosmic-silver': theme() === 'dark',
@@ -6,10 +6,18 @@
      }">
 
   @if (authService.isAuthenticated()) {
-    <app-sidebar></app-sidebar>
+    <div class="fixed inset-y-0 left-0 z-50 transform transition-all duration-500 ease-in-out lg:translate-x-0"
+         [ngClass]="layoutService.isSidebarExpanded() ? 'translate-x-0 w-64' : '-translate-x-full lg:w-20'">
+      <app-sidebar></app-sidebar>
+    </div>
+
+    @if (layoutService.isSidebarExpanded()) {
+      <div class="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm transition-opacity" 
+           (click)="layoutService.toggleSidebar()"></div>
+    }
   }
 
-  <main class="flex-1 min-h-screen flex flex-col relative transition-all duration-300"
+  <main class="flex-1 h-screen overflow-y-auto flex flex-col relative transition-all duration-500 ease-in-out w-full"
         [ngClass]="authService.isAuthenticated() ? (layoutService.isSidebarExpanded() ? 'lg:ml-64' : 'lg:ml-20') : ''">
     
     @if (authService.isAuthenticated()) {
@@ -20,6 +28,8 @@
       <router-outlet></router-outlet>
     </div>
     
-    <app-circular-fab></app-circular-fab>
+    @if (authService.isAuthenticated()) {
+      <app-circular-fab></app-circular-fab>
+    }
   </main>
 </div>

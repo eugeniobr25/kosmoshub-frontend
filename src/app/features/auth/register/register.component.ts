@@ -16,7 +16,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
-  private themeService = inject(ThemeService);
+  public themeService = inject(ThemeService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -24,25 +24,28 @@ export class RegisterComponent implements OnInit, OnDestroy {
   public isLoading = signal<boolean>(false);
   public errorMessage = signal<string | null>(null);
   
-  // Controles de Visibilidade
+  // Blindagem Máxima Anti-Autofill do Chrome
+  public isReadonly = signal<boolean>(true);
+  
   public showPassword = signal<boolean>(false);
   public showConfirmPassword = signal<boolean>(false);
   public showTermsModal = signal<boolean>(false);
 
-  // Sinais do Checklist de Senha
+  public isOpen = signal<boolean>(false);
+  public screenLantern = signal<boolean>(false);
+  public backLantern = signal<boolean>(false);
+
   public reqLength = signal<boolean>(false);
   public reqUpper = signal<boolean>(false);
   public reqLower = signal<boolean>(false);
   public reqNum = signal<boolean>(false);
   public reqSym = signal<boolean>(false);
 
-  // Status de Correspondência: null (neutro), true (igual), false (diferente)
   public matchStatus = signal<boolean | null>(null);
 
   private subPass!: Subscription;
   private subConfirm!: Subscription;
 
-  // Formulário Reativo (Inclui Validador de Regex e Termos de Uso)
   public registerForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
@@ -56,7 +59,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    // 1. Escuta mudanças na senha principal para atualizar o checklist instantaneamente
     this.subPass = this.registerForm.get('password')!.valueChanges.subscribe(val => {
       const v = val || '';
       this.reqLength.set(v.length >= 8);
@@ -64,11 +66,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.reqLower.set(/[a-z]/.test(v));
       this.reqNum.set(/[0-9]/.test(v));
       this.reqSym.set(/[^A-Za-z0-9]/.test(v));
-      
-      this.validateMatch(); // Revalida se mudar a senha principal
+      this.validateMatch(); 
     });
 
-    // 2. Escuta mudanças na confirmação com debounceTime (espera parar de digitar)
     this.subConfirm = this.registerForm.get('confirmPassword')!.valueChanges.pipe(
       debounceTime(600)
     ).subscribe(() => {
@@ -84,17 +84,31 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private validateMatch(): void {
     const p1 = this.registerForm.get('password')?.value;
     const p2 = this.registerForm.get('confirmPassword')?.value;
-    
     if (!p2) {
-      this.matchStatus.set(null); // Volta ao neutro se estiver vazio
+      this.matchStatus.set(null); 
     } else {
       this.matchStatus.set(p1 === p2);
     }
   }
 
-  public toggleTermsModal(): void {
-    this.showTermsModal.set(!this.showTermsModal());
+  // Remove a blindagem quando o utilizador toca no formulário
+  public disableReadonly(): void {
+    if (this.isReadonly()) {
+      this.isReadonly.set(false);
+    }
   }
+
+  public togglePassword(): void { this.showPassword.update(v => !v); }
+  public toggleConfirmPassword(): void { this.showConfirmPassword.update(v => !v); }
+  public toggleTermsModal(): void { this.showTermsModal.update(v => !v); }
+
+  public toggleMenu(): void { this.isOpen.update(v => !v); }
+  public changeTheme(newTheme: any): void { 
+    this.themeService.setTheme(newTheme); 
+    this.isOpen.set(false);
+  }
+  public toggleScreenLantern(): void { this.screenLantern.update(v => !v); }
+  public toggleBackLantern(): void { this.backLantern.update(v => !v); }
 
   public onSubmit(): void {
     if (this.registerForm.invalid || this.matchStatus() !== true) return;
@@ -102,16 +116,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const { name, email, password } = this.registerForm.value;
+    const { name, email, password } = this.registerForm.getRawValue();
 
-    this.authService.register({ name, email, password }).subscribe({
+    this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.router.navigate(['/auth/login']);
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Ocorreu um erro ao processar o seu registro na base.');
+        this.errorMessage.set(err.error?.message || 'Ocorreu um erro ao processar o seu registro.');
       }
     });
   }

@@ -1,159 +1,264 @@
-<div class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
+<div class="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col justify-between items-center p-4 relative font-sans transition-colors duration-500 w-full"
+     [ngClass]="{
+       'bg-slate-50': theme() === 'light',
+       'bg-space-blue-dark': theme() === 'dark',
+       'bg-pure-black': theme() === 'red'
+     }">
   
-  <div class="relative w-full max-w-md rounded-[2rem] p-10 backdrop-blur-xl transition-all duration-500 z-10"
-       [ngClass]="{
-         'bg-white/60 border border-white/50 shadow-2xl text-slate-900': theme() === 'light',
-         'bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] text-white': theme() === 'dark',
-         'bg-red-950/20 border border-mars-red/20 shadow-[0_0_40px_rgba(239,68,68,0.15)] text-mars-red': theme() === 'red'
-       }">
-    
-    <div class="text-center mb-6">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full overflow-hidden border p-1 transition-all duration-500 shadow-lg relative"
-           [ngClass]="{
-             'bg-white border-slate-300 shadow-slate-900/10': theme() === 'light',
-             'bg-space-blue/50 border-white/20 shadow-[0_0_25px_rgba(99,102,241,0.25)]': theme() === 'dark',
-             'bg-red-950/80 border-mars-red shadow-[0_0_25px_rgba(239,68,68,0.4)]': theme() === 'red'
-           }">
-        <img [src]="theme() === 'dark' ? '/assets/images/logo-no-name-grey.png' : (theme() === 'red' ? '/assets/images/logo-no-name-red.png' : '/assets/images/logo-no-name.png')" 
-             alt="KósmosHub Logo" class="w-full h-full object-cover rounded-full relative z-10">
-        @if (theme() === 'red') {
-          <div class="absolute inset-0 bg-red-600/20 pointer-events-none animate-pulse z-0"></div>
-        }
-      </div>
-      <h1 class="text-2xl font-heading font-bold tracking-widest uppercase mt-3">Novo Registo</h1>
-    </div>
+  <div class="w-full h-1 flex-shrink-0"></div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <main class="flex-shrink-0 flex flex-col items-center justify-center w-full relative z-10 my-auto"
+        (mouseenter)="disableReadonly()" (touchstart)="disableReadonly()">
+    <div class="relative w-full max-w-md rounded-[2rem] p-6 backdrop-blur-xl transition-all duration-500"
+         [ngClass]="{
+           'bg-white/60 border border-white/50 shadow-2xl text-slate-900': theme() === 'light',
+           'bg-white/5 border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] text-white': theme() === 'dark',
+           'bg-red-950/20 border border-mars-red/20 shadow-[0_0_40px_rgba(239,68,68,0.15)] text-mars-red': theme() === 'red'
+         }">
       
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Nome completo</label>
-        <input type="text" formControlName="name" placeholder="O seu nome"
-               class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm"
-               [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Email</label>
-        <input type="email" formControlName="email" placeholder="nome@exemplo.com"
-               class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm"
-               [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Senha</label>
-        <div class="relative">
-          <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••"
-                 class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm pr-12"
-                 [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'"/>
-          
-          <button type="button" 
-                  (mousedown)="showPassword.set(true)" (mouseup)="showPassword.set(false)" (mouseleave)="showPassword.set(false)"
-                  (touchstart)="showPassword.set(true)" (touchend)="showPassword.set(false)"
-                  class="absolute inset-y-0 right-0 pr-4 flex items-center opacity-50 hover:opacity-100 transition-opacity">
-            <i class="fa-solid" [ngClass]="showPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-1 px-1 mt-1">
-          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLength() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
-            <i class="fa-solid" [ngClass]="reqLength() ? 'fa-check' : 'fa-xmark'"></i> Mín. 8 caracteres
-          </div>
-          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqUpper() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
-            <i class="fa-solid" [ngClass]="reqUpper() ? 'fa-check' : 'fa-xmark'"></i> Maiúscula
-          </div>
-          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLower() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
-            <i class="fa-solid" [ngClass]="reqLower() ? 'fa-check' : 'fa-xmark'"></i> Minúscula
-          </div>
-          <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqNum() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
-            <i class="fa-solid" [ngClass]="reqNum() ? 'fa-check' : 'fa-xmark'"></i> Número
-          </div>
-          <div class="text-[9px] col-span-2 flex items-center gap-1 transition-colors" [ngClass]="reqSym() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40'">
-            <i class="fa-solid" [ngClass]="reqSym() ? 'fa-check' : 'fa-xmark'"></i> Símbolo (ex: !@#$*)
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1">Confirmar Senha</label>
-        <div class="relative">
-          <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••"
-                 class="w-full px-4 py-3 rounded-2xl bg-transparent border outline-none font-mono text-sm pr-12 transition-all"
-                 [ngClass]="{
-                   'border-slate-400/50 focus:border-indigo-400': matchStatus() === null && theme() !== 'red',
-                   'border-mars-red/30 focus:border-mars-red': matchStatus() === null && theme() === 'red',
-                   'border-green-500 text-green-500': matchStatus() === true && theme() !== 'red',
-                   'border-red-500 text-red-500': matchStatus() === false && theme() !== 'red',
-                   'border-mars-red text-mars-red shadow-[0_0_10px_rgba(239,68,68,0.5)]': matchStatus() === true && theme() === 'red',
-                   'border-red-800 text-red-800': matchStatus() === false && theme() === 'red'
-                 }"/>
-          <button type="button" 
-                  (mousedown)="showConfirmPassword.set(true)" (mouseup)="showConfirmPassword.set(false)" (mouseleave)="showConfirmPassword.set(false)"
-                  (touchstart)="showConfirmPassword.set(true)" (touchend)="showConfirmPassword.set(false)"
-                  class="absolute inset-y-0 right-0 pr-4 flex items-center opacity-50 hover:opacity-100">
-            <i class="fa-solid" [ngClass]="showConfirmPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
-          </button>
-        </div>
-
-        <div class="h-1 w-full rounded-full transition-all duration-500 mt-1"
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full overflow-hidden border p-1 transition-all duration-500 shadow-lg relative"
              [ngClass]="{
-               'bg-current opacity-20': matchStatus() === null,
-               'bg-green-500': matchStatus() === true && theme() !== 'red',
-               'bg-red-500': matchStatus() === false && theme() !== 'red',
-               'bg-mars-red shadow-[0_0_5px_rgba(239,68,68,0.8)]': matchStatus() === true && theme() === 'red',
-               'bg-red-900': matchStatus() === false && theme() === 'red'
-             }"></div>
-        
-        <div class="h-3 ml-1">
-          @if (matchStatus() === true) {
-            <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-green-500'">As senhas coincidem.</p>
-          } @else if (matchStatus() === false) {
-            <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-red-800' : 'text-red-500'">As senhas não coincidem.</p>
+               'bg-white border-slate-300 shadow-slate-900/10': theme() === 'light',
+               'bg-space-blue/50 border-white/20 shadow-[0_0_25px_rgba(99,102,241,0.25)]': theme() === 'dark',
+               'bg-red-950/80 border-mars-red shadow-[0_0_25px_rgba(239,68,68,0.4)]': theme() === 'red'
+             }">
+          <img [src]="theme() === 'dark' ? '/assets/images/logo-no-name-grey.png' : (theme() === 'red' ? '/assets/images/logo-no-name-red.png' : '/assets/images/logo-no-name.png')" 
+               alt="KósmosHub Logo" class="w-full h-full object-cover rounded-full relative z-10">
+          @if (theme() === 'red') {
+            <div class="absolute inset-0 bg-red-600/20 pointer-events-none animate-pulse z-0"></div>
           }
         </div>
+        <h1 class="text-2xl font-heading font-bold tracking-widest uppercase mt-3 text-current">Novo Registo</h1>
       </div>
 
-      <div class="flex items-center gap-2 mt-2 ml-1">
-        <label class="flex items-center gap-2 cursor-pointer group">
-          <div class="relative flex items-center justify-center w-4 h-4 rounded border transition-colors"
-               [ngClass]="theme() === 'red' ? 'border-mars-red/50 group-hover:border-mars-red' : 'border-slate-400/50 group-hover:border-indigo-400'">
-            <input type="checkbox" formControlName="terms" class="peer opacity-0 absolute inset-0 cursor-pointer">
-            <i class="fa-solid fa-check text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"
-               [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'"></i>
-          </div>
-        </label>
-        <span class="text-[10px] opacity-80 select-none">
-          Li e concordo com os 
-          <a href="javascript:void(0)" (click)="toggleTermsModal()" class="font-bold underline transition-colors"
-             [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'">Termos de Uso e Privacidade</a>.
-        </span>
-      </div>
-
-      @if (errorMessage()) {
-        <div class="text-center text-xs font-bold animate-pulse p-2 rounded-lg mt-1" 
-             [ngClass]="theme() === 'red' ? 'bg-mars-red/10 text-mars-red' : 'bg-red-500/10 text-red-500'">
-          <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ errorMessage() }}
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-3.5">
+        
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1 text-current">Nome completo</label>
+          <input type="text" formControlName="name" placeholder="O seu nome"
+                 autocomplete="off" [readonly]="isReadonly()" (focus)="disableReadonly()"
+                 class="w-full px-4 py-2.5 rounded-xl bg-transparent border outline-none font-mono text-sm px-4 transition-colors focus:ring-0"
+                 [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'">
         </div>
-      }
 
-      <button type="submit" [disabled]="registerForm.invalid || matchStatus() !== true || isLoading()"
-              class="w-full py-4 mt-2 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 shadow-lg disabled:opacity-30 disabled:cursor-not-allowed"
-              [ngClass]="theme() === 'red' ? 'bg-mars-red text-pure-black hover:bg-red-600' : 'bg-slate-900 text-white hover:bg-slate-800'">
-        @if (isLoading()) {
-          <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
-        } @else {
-          Concluir Registo
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1 text-current">Email</label>
+          <input type="email" formControlName="email" placeholder="nome@exemplo.com"
+                 autocomplete="new-email" [readonly]="isReadonly()" (focus)="disableReadonly()"
+                 class="w-full px-4 py-2.5 rounded-xl bg-transparent border outline-none font-mono text-sm px-4 transition-colors focus:ring-0"
+                 [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1 text-current">Senha</label>
+          <div class="relative">
+            <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••"
+                   autocomplete="new-password" [readonly]="isReadonly()" (focus)="disableReadonly()"
+                   class="w-full px-4 py-2.5 rounded-xl bg-transparent border outline-none font-mono text-sm pr-12 pl-4 transition-colors focus:ring-0"
+                   [ngClass]="theme() === 'red' ? 'border-mars-red/30 text-mars-red focus:border-mars-red' : 'border-slate-400/50 focus:border-indigo-400'">
+            
+            <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center transition-colors focus:outline-none"
+                    [ngClass]="theme() === 'red' ? 'text-mars-red/60 hover:text-mars-red' : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200'">
+              <i class="fa-solid" [ngClass]="showPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-1 px-1 mt-1">
+            <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLength() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40 text-current'">
+              <i class="fa-solid" [ngClass]="reqLength() ? 'fa-check' : 'fa-xmark'"></i> Mín. 8 caracteres
+            </div>
+            <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqUpper() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40 text-current'">
+              <i class="fa-solid" [ngClass]="reqUpper() ? 'fa-check' : 'fa-xmark'"></i> Maiúscula
+            </div>
+            <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqLower() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40 text-current'">
+              <i class="fa-solid" [ngClass]="reqLower() ? 'fa-check' : 'fa-xmark'"></i> Minúscula
+            </div>
+            <div class="text-[9px] flex items-center gap-1 transition-colors" [ngClass]="reqNum() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40 text-current'">
+              <i class="fa-solid" [ngClass]="reqNum() ? 'fa-check' : 'fa-xmark'"></i> Número
+            </div>
+            <div class="text-[9px] col-span-2 flex items-center gap-1 transition-colors" [ngClass]="reqSym() ? (theme() === 'red' ? 'text-mars-red' : 'text-green-500') : 'opacity-40 text-current'">
+              <i class="fa-solid" [ngClass]="reqSym() ? 'fa-check' : 'fa-xmark'"></i> Símbolo (ex: !@#$*)
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] uppercase tracking-widest opacity-80 font-bold ml-1 text-current">Confirmar Senha</label>
+          <div class="relative">
+            <input [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••"
+                   autocomplete="new-password" [readonly]="isReadonly()" (focus)="disableReadonly()"
+                   class="w-full px-4 py-2.5 rounded-xl bg-transparent border outline-none font-mono text-sm pr-12 pl-4 transition-all focus:ring-0"
+                   [ngClass]="{
+                     'border-slate-400/50 focus:border-indigo-400': matchStatus() === null && theme() !== 'red',
+                     'border-mars-red/30 focus:border-mars-red text-mars-red': matchStatus() === null && theme() === 'red',
+                     'border-green-500 text-green-500': matchStatus() === true && theme() !== 'red',
+                     'border-red-500 text-red-500': matchStatus() === false && theme() !== 'red',
+                     'border-mars-red text-mars-red shadow-[0_0_10px_rgba(239,68,68,0.5)]': matchStatus() === true && theme() === 'red',
+                     'border-red-800 text-red-800': matchStatus() === false && theme() === 'red'
+                   }"/>
+            <button type="button" (click)="toggleConfirmPassword()" class="absolute inset-y-0 right-0 pr-4 flex items-center transition-colors focus:outline-none"
+                    [ngClass]="theme() === 'red' ? 'text-mars-red/60 hover:text-mars-red' : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200'">
+              <i class="fa-solid" [ngClass]="showConfirmPassword() ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+
+          <div class="h-1 w-full rounded-full transition-all duration-500 mt-1"
+               [ngClass]="{
+                 'bg-current opacity-20': matchStatus() === null,
+                 'bg-green-500': matchStatus() === true && theme() !== 'red',
+                 'bg-red-500': matchStatus() === false && theme() !== 'red',
+                 'bg-mars-red shadow-[0_0_5px_rgba(239,68,68,0.8)]': matchStatus() === true && theme() === 'red',
+                 'bg-red-900': matchStatus() === false && theme() === 'red'
+               }"></div>
+          
+          <div class="h-3 ml-1 mb-1">
+            @if (matchStatus() === true) {
+              <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-green-500'">As senhas coincidem.</p>
+            } @else if (matchStatus() === false) {
+              <p class="text-[9px] font-bold" [ngClass]="theme() === 'red' ? 'text-red-800' : 'text-red-500'">As senhas não coincidem.</p>
+            }
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 ml-1">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative flex items-center justify-center w-4 h-4 rounded border transition-colors bg-black/5"
+                 [ngClass]="theme() === 'red' ? 'border-mars-red/50 group-hover:border-mars-red' : 'border-slate-400/50 group-hover:border-indigo-400'">
+              <input type="checkbox" formControlName="terms" class="peer opacity-0 absolute inset-0 cursor-pointer">
+              <i class="fa-solid fa-check text-[10px] opacity-0 peer-checked:opacity-100 transition-opacity"
+                 [ngClass]="theme() === 'red' ? 'text-mars-red' : 'text-indigo-500'"></i>
+            </div>
+          </label>
+          <span class="text-[10px] opacity-80 select-none text-current">
+            Li e concordo com os 
+            <button type="button" (click)="toggleTermsModal()" class="font-bold underline transition-colors cursor-pointer bg-transparent border-none p-0 m-0 inline"
+               [ngClass]="theme() === 'red' ? 'text-mars-red hover:text-red-400' : 'text-indigo-500 hover:text-indigo-400'">Termos de Uso e Privacidade</button>.
+          </span>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="text-center text-xs font-bold animate-pulse p-2 rounded-lg mt-1" 
+               [ngClass]="theme() === 'red' ? 'bg-mars-red/10 text-mars-red' : 'bg-red-500/10 text-red-500'">
+            <i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ errorMessage() }}
+          </div>
         }
-      </button>
-      
-      <div class="text-center mt-2 border-t pt-4" [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-slate-400/20'">
-        <p class="text-xs opacity-70 mb-2">Já possui uma conta?</p>
-        <button type="button" routerLink="/auth/login"
-                class="w-full py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 border-2"
-                [ngClass]="theme() === 'red' ? 'border-mars-red/50 text-mars-red hover:bg-mars-red/10' : 'border-slate-400/50 hover:bg-slate-400/10'">
-          Voltar para Login
+
+        <button type="submit" [disabled]="registerForm.invalid || matchStatus() !== true || isLoading()"
+                class="w-full py-3.5 mt-1 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all duration-300 shadow-lg disabled:opacity-30 disabled:cursor-not-allowed border border-transparent active:scale-95"
+                [ngClass]="theme() === 'red' ? 'bg-mars-red text-pure-black hover:bg-red-600 border-mars-red/30' : 'bg-slate-900 text-white hover:bg-slate-800'">
+          @if (isLoading()) {
+            <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
+          } @else {
+            Concluir Registo
+          }
         </button>
-      </div>
-    </form>
+        
+        <div class="text-center mt-1 border-t pt-4" [ngClass]="theme() === 'red' ? 'border-mars-red/20' : 'border-slate-400/20'">
+          <p class="text-xs opacity-70 mb-2 text-current">Já possui uma conta?</p>
+          <button type="button" routerLink="/auth/login"
+                  class="w-full py-2.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-300 border active:scale-95 text-center"
+                  [ngClass]="theme() === 'red' ? 'border-mars-red/50 text-mars-red hover:bg-mars-red/10' : 'border-slate-400/50 hover:bg-slate-400/10 text-current'">
+            Voltar para Login
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="w-full py-2 border-t border-current/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] opacity-60 flex-shrink-0 mt-1 px-4 lg:px-6 relative z-10">
+    <div class="flex items-center gap-2 select-none">
+      <img src="/assets/images/logo-no-name.png" class="w-4 h-4 object-contain opacity-80" alt="Mini Ícone">
+      <span class="font-heading font-bold tracking-wider uppercase text-[11px] leading-tight break-words whitespace-normal text-current">
+        @if (theme() === 'light') { <span class="text-slate-900">Kósmos</span><span class="text-indigo-600">Hub</span> }
+        @else if (theme() === 'dark') { <span class="text-cosmic-silver">KósmosHub</span> }
+        @else { <span class="text-mars-red">KósmosHub</span> }
+      </span>
+    </div>
+    <div class="flex items-center gap-4 text-[9px] tracking-widest uppercase font-mono leading-tight break-words whitespace-normal text-right text-current opacity-90">
+      <span>v1.0.0-MVP Enterprise Baseline</span>
+      <span class="hidden md:inline text-current/30">•</span>
+      <span class="hidden md:inline text-current/70">Telemetry Secured by Bearer JWT</span>
+      <span>•</span>
+      <span class="font-sans normal-case opacity-90">© 2026 KósmosHub. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <div class="fixed bottom-6 right-6 z-50 flex items-center justify-center font-heading">
+    <div class="absolute transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-20"
+         [ngClass]="isOpen() ? 'translate-x-[-4rem] opacity-100 pointer-events-auto delay-0' : 'scale-50 opacity-0 delay-[150ms]'">
+      <button (click)="changeTheme('red')" 
+              class="btn-astro w-11 h-11 rounded-full flex items-center justify-center border bg-pure-black border-mars-red text-mars-red shadow-[0_0_10px_rgba(239,68,68,0.3)]"
+              [class.ring-2]="theme() === 'red'" [class.ring-mars-red]="theme() === 'red'">
+        <i class="fa-solid fa-eye text-base"></i>
+      </button>
+    </div>
+
+    <div class="absolute transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-20"
+         [ngClass]="isOpen() ? 'translate-x-[-2.83rem] translate-y-[-2.83rem] opacity-100 pointer-events-auto delay-0' : 'scale-50 opacity-0 delay-[150ms]'">
+      <button (click)="changeTheme('dark')" 
+              class="btn-astro w-11 h-11 rounded-full flex items-center justify-center border bg-space-blue-dark border-white/10 text-cosmic-silver shadow-md"
+              [class.ring-2]="theme() === 'dark'" [class.ring-nebula-purple]="theme() === 'dark'">
+        <i class="fa-solid fa-moon text-base"></i>
+      </button>
+    </div>
+
+    <div class="absolute transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-20"
+         [ngClass]="isOpen() ? 'translate-y-[-4rem] opacity-100 pointer-events-auto delay-0' : 'scale-50 opacity-0 delay-[150ms]'">
+      <button (click)="changeTheme('light')" 
+              class="btn-astro w-11 h-11 rounded-full flex items-center justify-center border bg-white border-slate-300 text-slate-900 shadow-md"
+              [class.ring-2]="theme() === 'light'" [class.ring-slate-900]="theme() === 'light'">
+        <i class="fa-solid fa-sun text-base"></i>
+      </button>
+    </div>
+
+    <div class="absolute transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-10"
+         [ngClass]="isOpen() ? 'translate-y-[-7.5rem] opacity-100 pointer-events-auto delay-[150ms]' : 'scale-50 opacity-0 delay-0'">
+      <button (click)="toggleScreenLantern()" class="btn-astro w-11 h-11 rounded-full flex items-center justify-center border"
+              [ngClass]="{
+                'bg-white border-slate-300 text-slate-400': theme() === 'light' && !screenLantern(),
+                'bg-slate-900 border-slate-900 text-white font-bold': theme() === 'light' && screenLantern(),
+                'bg-space-blue-light border-white/10 text-slate-500': theme() === 'dark' && !screenLantern(),
+                'bg-nebula-purple border-transparent text-white font-bold shadow-md shadow-indigo-600/20': theme() === 'dark' && screenLantern(),
+                'bg-mars-red-pure border-mars-red-dark/40 text-mars-red/40': theme() === 'red' && !screenLantern(),
+                'bg-red-950 border-mars-red text-mars-red font-bold shadow-[0_0_10px_rgba(239,68,68,0.4)]': theme() === 'red' && screenLantern()
+              }">
+        <i class="fa-solid fa-display text-base" [class.animate-pulse]="screenLantern()"></i>
+      </button>
+    </div>
+
+    <div class="absolute transition-all duration-300 ease-out pointer-events-none flex items-center justify-center z-10"
+         [ngClass]="isOpen() ? 'translate-x-[-3.17rem] translate-y-[-6.8rem] opacity-100 pointer-events-auto delay-[150ms]' : 'scale-50 opacity-0 delay-0'">
+      <button (click)="toggleBackLantern()" class="btn-astro w-11 h-11 rounded-full flex items-center justify-center border"
+              [ngClass]="{
+                'bg-white border-slate-300 text-slate-400': theme() === 'light' && !backLantern(),
+                'bg-slate-900 border-slate-900 text-white font-bold': theme() === 'light' && backLantern(),
+                'bg-space-blue-light border-white/10 text-slate-500': theme() === 'dark' && !backLantern(),
+                'bg-nebula-purple border-transparent text-white font-bold shadow-md shadow-indigo-600/20': theme() === 'dark' && backLantern(),
+                'bg-mars-red-pure border-mars-red-dark/40 text-mars-red/40': theme() === 'red' && !backLantern(),
+                'bg-red-950 border-mars-red text-mars-red font-bold shadow-[0_0_10px_rgba(239,68,68,0.4)]': theme() === 'red' && backLantern()
+              }">
+        <i class="fa-solid fa-lightbulb text-base" [class.animate-pulse]="backLantern()"></i>
+      </button>
+    </div>
+
+    @switch (theme()) {
+      @case ('light') {
+        <button (click)="toggleMenu()" class="btn-astro w-14 h-14 rounded-full flex items-center justify-center border border-slate-900 bg-slate-900 text-white shadow-md z-30">
+          <i class="fa-solid text-xl" [ngClass]="isOpen() ? 'fa-xmark' : 'fa-bars'"></i>
+        </button>
+      }
+      @case ('dark') {
+        <button (click)="toggleMenu()" class="btn-astro w-14 h-14 rounded-full flex items-center justify-center border border-transparent bg-nebula-purple text-white shadow-lg z-30 hover:bg-indigo-700">
+          <i class="fa-solid text-xl" [ngClass]="isOpen() ? 'fa-xmark' : 'fa-bars'"></i>
+        </button>
+      }
+      @case ('red') {
+        <button (click)="toggleMenu()" class="btn-astro w-14 h-14 rounded-full flex items-center justify-center border border-mars-red bg-pure-black text-mars-red shadow-[0_0_15px_rgba(239,68,68,0.4)] z-30">
+          <i class="fa-solid text-xl" [ngClass]="isOpen() ? 'fa-xmark' : 'fa-bars'"></i>
+        </button>
+      }
+    }
   </div>
 </div>
 

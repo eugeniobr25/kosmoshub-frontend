@@ -15,18 +15,24 @@ export class SidebarComponent {
   public layoutService = inject(LayoutService);
   public theme = this.themeService.currentTheme;
 
-  // Lógica inteligente para cruzar a expansão com a cor do tema
-  public getLogoUrl(): string {
-    const isExpanded = this.layoutService.isSidebarExpanded();
-    const currentTheme = this.theme();
+  public getLogoExpandedUrl(): string {
+    const t = this.theme();
+    if (t === 'dark') return '/assets/images/logo-no-name-grey.png';
+    if (t === 'red') return '/assets/images/logo-no-name-red.png';
+    return '/assets/images/logo-no-name.png';
+  }
 
-    if (currentTheme === 'dark') {
-      return isExpanded ? '/assets/images/logo-name-grey.png' : '/assets/images/logo-no-name-grey.png';
-    } else if (currentTheme === 'red') {
-      return isExpanded ? '/assets/images/logo-name-red.png' : '/assets/images/logo-no-name-red.png';
-    } else {
-      // Tema Claro (Light)
-      return isExpanded ? '/assets/images/logo-name.png' : '/assets/images/logo-no-name.png';
+  public getLogoCollapsedUrl(): string {
+    const t = this.theme();
+    if (t === 'dark') return '/assets/images/logo-name-grey.png';
+    if (t === 'red') return '/assets/images/logo-name-red.png';
+    return '/assets/images/logo-name.png';
+  }
+
+  // Intercetor de Cliques: Recolhe a Sidebar caso o utilizador esteja em ecrãs Mobile/Tablet
+  public handleNavigationClick(): void {
+    if (window.innerWidth < 1024) { // Ponto de rutura 'lg' do Tailwind
+      this.layoutService.toggleSidebar(); // Fecha suavemente a gaveta
     }
   }
 }
